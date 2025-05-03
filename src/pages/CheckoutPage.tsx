@@ -24,7 +24,7 @@ const CheckoutPage = () => {
     city: '',
     state: '',
     zipCode: '',
-    phone: user?.phone || '',
+    phone: '', // Removed user?.phone reference as it doesn't exist on User type
   });
   const [paymentMethod, setPaymentMethod] = useState('credit_card');
   

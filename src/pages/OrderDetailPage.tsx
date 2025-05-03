@@ -17,7 +17,7 @@ const mockOrderDetails = {
     { id: 3, name: 'Whole Wheat Bread', price: 2.50, quantity: 1, image: 'https://via.placeholder.com/100' },
   ],
   subtotal: 15.94,
-  shipping: 2.99,
+  shippingCost: 2.99, // Renamed from 'shipping' to avoid duplicate property
   tax: 1.52,
   total: 20.45,
   status: 'delivered',
@@ -26,7 +26,7 @@ const mockOrderDetails = {
     lastFour: '1234',
     paid: true,
   },
-  shipping: {
+  shippingInfo: { // Renamed from 'shipping' to avoid duplicate property
     address: '123 Main St, Apt 4B',
     city: 'New York',
     state: 'NY',
@@ -53,7 +53,7 @@ const mockOrderDetails2 = {
     { id: 6, name: 'Mixed Vegetables', price: 3.99, quantity: 1, image: 'https://via.placeholder.com/100' },
   ],
   subtotal: 18.97,
-  shipping: 2.99,
+  shippingCost: 2.99, // Renamed from 'shipping' to avoid duplicate property
   tax: 1.90,
   total: 23.86,
   status: 'shipped',
@@ -62,7 +62,7 @@ const mockOrderDetails2 = {
     lastFour: '5678',
     paid: true,
   },
-  shipping: {
+  shippingInfo: { // Renamed from 'shipping' to avoid duplicate property
     address: '123 Main St, Apt 4B',
     city: 'New York',
     state: 'NY',
@@ -180,7 +180,7 @@ const OrderDetailPage = () => {
                 </div>
                 <div className="flex justify-between text-sm mt-2">
                   <span>Shipping</span>
-                  <span>${order.shipping.toFixed ? order.shipping.toFixed(2) : '2.99'}</span>
+                  <span>${order.shippingCost.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm mt-2">
                   <span>Tax</span>
@@ -254,27 +254,27 @@ const OrderDetailPage = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-2">
-              <p><span className="font-medium">Address:</span> {order.shipping.address}</p>
-              <p>{order.shipping.city}, {order.shipping.state} {order.shipping.zipCode}</p>
+              <p><span className="font-medium">Address:</span> {order.shippingInfo.address}</p>
+              <p>{order.shippingInfo.city}, {order.shippingInfo.state} {order.shippingInfo.zipCode}</p>
               
               <Separator className="my-2" />
               
-              {order.shipping.tracking && (
+              {order.shippingInfo.tracking && (
                 <>
                   <div>
-                    <span className="font-medium">Tracking:</span> {order.shipping.tracking}
+                    <span className="font-medium">Tracking:</span> {order.shippingInfo.tracking}
                   </div>
                   <div>
-                    <span className="font-medium">Carrier:</span> {order.shipping.carrier}
+                    <span className="font-medium">Carrier:</span> {order.shippingInfo.carrier}
                   </div>
                 </>
               )}
               
-              {order.shipping.estimatedDelivery && (
+              {order.shippingInfo.estimatedDelivery && (
                 <div className="flex items-center text-sm text-gray-600 mt-1">
                   <Calendar className="h-4 w-4 mr-1" />
                   <span>
-                    Estimated delivery: {new Date(order.shipping.estimatedDelivery).toLocaleDateString()}
+                    Estimated delivery: {new Date(order.shippingInfo.estimatedDelivery).toLocaleDateString()}
                   </span>
                 </div>
               )}
