@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom colors for our grocery store
+				grocery: {
+					primary: '#4CAF50',
+					secondary: '#FF9800',
+					light: '#F5F5F5',
+					dark: '#333333',
+					accent: '#2196F3',
 				}
 			},
 			borderRadius: {
