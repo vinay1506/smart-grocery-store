@@ -14,15 +14,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import * as db from '@/utils/db';
+import { toast } from 'sonner';
 
-// Mock data
-const categories = [
+// Fallback mock data in case the database connection fails
+const fallbackCategories = [
   { id: 1, name: 'Dairy' },
   { id: 2, name: 'Vegetables' },
   { id: 3, name: 'Beverages' },
 ];
 
-const products = [
+const fallbackProducts = [
   {
     id: 1,
     name: 'Milk',
@@ -102,9 +104,15 @@ interface Product {
   name: string;
   price: number;
   categoryId: number;
+  categoryName?: string;
   stock: number;
   description: string;
   image: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
 }
 
 const ProductsPage = () => {
@@ -112,20 +120,61 @@ const ProductsPage = () => {
   const categoryParam = searchParams.get('category');
   const searchParam = searchParams.get('search');
   
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState(searchParam || '');
-  const [categoryFilter, setCategoryFilter] = useState(categoryParam || '');
-  const [sortBy, setSortBy] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState(categoryParam || 'all');
+  const [sortBy, setSortBy] = useState('default');
+  const [isLoading, setIsLoading] = useState(true);
+  const [dbConnectionError, setDbConnectionError] = useState(false);
   
   const { addToCart } = useCart();
+  
+  // Fetch categories and products from database
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Test database connection
+        const isConnected = await db.testConnection();
+        if (!isConnected) {
+          setDbConnectionError(true);
+          setCategories(fallbackCategories);
+          setProducts(fallbackProducts);
+          toast.error('Database connection failed. Using fallback data.');
+          return;
+        }
+        
+        // Fetch categories
+        const categoriesData = await db.getCategories();
+        setCategories(categoriesData as Category[]);
+        
+        // Fetch products
+        const productsData = await db.getProducts(categoryFilter !== 'all' ? categoryFilter : undefined, searchQuery || undefined);
+        setProducts(productsData as Product[]);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setDbConnectionError(true);
+        setCategories(fallbackCategories);
+        setProducts(fallbackProducts);
+        toast.error('Error fetching data. Using fallback data.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
   
   // Handle filtering and sorting
   useEffect(() => {
     let result = [...products];
     
     // Filter by category
-    if (categoryFilter) {
-      result = result.filter(product => product.categoryId === parseInt(categoryFilter));
+    if (categoryFilter && categoryFilter !== 'all') {
+      result = result.filter(product => product.categoryId.toString() === categoryFilter);
     }
     
     // Filter by search query
@@ -149,13 +198,13 @@ const ProductsPage = () => {
     }
     
     setFilteredProducts(result);
-  }, [categoryFilter, searchQuery, sortBy]);
+  }, [products, categoryFilter, searchQuery, sortBy]);
   
   // Update URL params when filters change
   useEffect(() => {
     const params = new URLSearchParams();
     
-    if (categoryFilter) {
+    if (categoryFilter && categoryFilter !== 'all') {
       params.set('category', categoryFilter);
     }
     
@@ -199,6 +248,9 @@ const ProductsPage = () => {
     <div>
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Products</h1>
+        {dbConnectionError && (
+          <Badge variant="destructive">Using Mock Data</Badge>
+        )}
       </div>
       
       {/* Filters and Search */}
@@ -255,7 +307,25 @@ const ProductsPage = () => {
         </div>
       </div>
       
-      {filteredProducts.length === 0 ? (
+      {/* Loading State */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <Card key={i} className="overflow-hidden h-full animate-pulse">
+              <div className="h-48 bg-gray-200"></div>
+              <CardContent className="p-4">
+                <div className="h-4 bg-gray-200 rounded mb-2 w-1/3"></div>
+                <div className="h-6 bg-gray-200 rounded mb-1"></div>
+                <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                <div className="flex justify-between items-center">
+                  <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+                  <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : filteredProducts.length === 0 ? (
         <div className="bg-white p-8 rounded-lg shadow-sm text-center">
           <h2 className="text-xl font-semibold mb-2">No products found</h2>
           <p className="text-gray-600 mb-4">Try changing your search or filter criteria</p>
@@ -263,8 +333,8 @@ const ProductsPage = () => {
             variant="outline"
             onClick={() => {
               setSearchQuery('');
-              setCategoryFilter('');
-              setSortBy('');
+              setCategoryFilter('all');
+              setSortBy('default');
             }}
           >
             Reset Filters
@@ -283,7 +353,7 @@ const ProductsPage = () => {
               </div>
               <CardContent className="p-4">
                 <Badge variant="outline" className="mb-2">
-                  {getCategoryName(product.categoryId)}
+                  {product.categoryName || getCategoryName(product.categoryId)}
                 </Badge>
                 <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">{product.description}</p>
