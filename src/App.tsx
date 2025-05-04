@@ -1,96 +1,64 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { CartProvider } from './contexts/CartContext';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Products from './pages/Products';
+import ProductDetails from './pages/ProductDetails';
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
+import OrderConfirmation from './pages/OrderConfirmation';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-// Pages
-import HomePage from "./pages/HomePage";
-import ProductsPage from "./pages/ProductsPage";
-import ProductDetailPage from "./pages/ProductDetailPage";
-import CartPage from "./pages/CartPage";
-import CheckoutPage from "./pages/CheckoutPage";
-import OrdersPage from "./pages/OrdersPage";
-import OrderDetailPage from "./pages/OrderDetailPage";
-import LoginPage from "./pages/auth/LoginPage";
-import RegisterPage from "./pages/auth/RegisterPage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-import TermsPage from "./pages/TermsPage";
-
-// Admin Pages
-import AdminLoginPage from "./pages/admin/AdminLoginPage";
-import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
-import AdminProductsPage from "./pages/admin/AdminProductsPage";
-import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
-import AdminCustomersPage from "./pages/admin/AdminCustomersPage";
-
-// Layout components
-import Layout from "./components/layout/Layout";
-import AdminLayout from "./components/layout/AdminLayout";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import AdminRoute from "./components/auth/AdminRoute";
-import NotFound from "./pages/NotFound";
-
-// Auth context provider
-import { AuthProvider } from "./context/AuthContext";
-
-// Cart context provider
-import { CartProvider } from "./context/CartContext";
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
+function App() {
+  return (
+    <Router>
       <CartProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+        <div className="min-h-screen bg-grocery-light">
+          <Navbar />
+          <main className="container mx-auto px-4 py-8">
             <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Layout />}>
-                <Route index element={<HomePage />} />
-                <Route path="products" element={<ProductsPage />} />
-                <Route path="products/:productId" element={<ProductDetailPage />} />
-                <Route path="cart" element={<CartPage />} />
-                <Route path="about" element={<AboutPage />} />
-                <Route path="contact" element={<ContactPage />} />
-                <Route path="terms" element={<TermsPage />} />
-                <Route path="login" element={<LoginPage />} />
-                <Route path="register" element={<RegisterPage />} />
-              </Route>
-
-              {/* Protected Customer Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Layout />}>
-                  <Route path="checkout" element={<CheckoutPage />} />
-                  <Route path="orders" element={<OrdersPage />} />
-                  <Route path="orders/:orderId" element={<OrderDetailPage />} />
-                </Route>
-              </Route>
-
-              {/* Admin Routes */}
-              <Route path="/admin/login" element={<AdminLoginPage />} />
-              <Route path="/admin" element={<AdminRoute />}>
-                <Route element={<AdminLayout />}>
-                  <Route index element={<AdminDashboardPage />} />
-                  <Route path="products" element={<AdminProductsPage />} />
-                  <Route path="orders" element={<AdminOrdersPage />} />
-                  <Route path="customers" element={<AdminCustomersPage />} />
-                </Route>
-              </Route>
-
-              {/* 404 Route */}
-              <Route path="*" element={<NotFound />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/products/:id" element={<ProductDetails />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/order-confirmation" element={<OrderConfirmation />} />
             </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+          </main>
+          <footer className="bg-white py-8 mt-12">
+            <div className="container mx-auto px-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                  <h3 className="text-lg font-semibold text-grocery-dark mb-4">About Us</h3>
+                  <p className="text-gray-600">
+                    Your one-stop shop for fresh groceries and household essentials.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-grocery-dark mb-4">Quick Links</h3>
+                  <ul className="space-y-2">
+                    <li><a href="/products" className="text-gray-600 hover:text-grocery-primary">Products</a></li>
+                    <li><a href="/categories" className="text-gray-600 hover:text-grocery-primary">Categories</a></li>
+                    <li><a href="/about" className="text-gray-600 hover:text-grocery-primary">About</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-grocery-dark mb-4">Contact Us</h3>
+                  <ul className="space-y-2">
+                    <li className="text-gray-600">Email: info@grocerystore.com</li>
+                    <li className="text-gray-600">Phone: (123) 456-7890</li>
+                    <li className="text-gray-600">Address: 123 Grocery St, City</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-8 pt-8 border-t border-gray-200 text-center text-gray-600">
+                <p>&copy; 2024 GroceryStore. All rights reserved.</p>
+              </div>
+            </div>
+          </footer>
+        </div>
       </CartProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+    </Router>
+  );
+}
 
 export default App;
