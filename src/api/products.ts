@@ -14,6 +14,14 @@ export interface Category {
   category_name: string;
 }
 
+export interface CreateProductData {
+  name: string;
+  description: string;
+  price: number;
+  category_id: number;
+  image_url?: string;
+}
+
 const API_URL = 'http://localhost:3000/api';
 
 export const getProducts = async (category?: string, search?: string): Promise<Product[]> => {
@@ -42,14 +50,37 @@ export const getCategories = async (): Promise<Category[]> => {
 };
 
 export const getProductById = async (id: number): Promise<Product> => {
-  const response = await fetch(`${API_URL}/products/${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch product');
+  try {
+    const response = await fetch(`http://localhost:3000/api/products/${id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch product');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    throw error;
   }
-  const product = await response.json();
-  // Convert price string to number
-  return {
-    ...product,
-    price: parseFloat(product.price)
-  };
+};
+
+export const createProduct = async (productData: CreateProductData): Promise<Product> => {
+  try {
+    const response = await fetch('http://localhost:3000/api/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(productData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create product');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
 }; 

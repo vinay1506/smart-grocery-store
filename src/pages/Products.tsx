@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Search, Filter } from 'lucide-react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Search, Filter, Plus } from 'lucide-react';
 import { getProducts, getCategories, Product, Category } from '../api/products';
 import { useCart } from '../contexts/CartContext';
 
 const Products = () => {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -13,22 +14,22 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
   const { addToCart } = useCart();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [productsData, categoriesData] = await Promise.all([
-          getProducts(selectedCategory === 'all' ? undefined : selectedCategory, searchTerm),
-          getCategories()
-        ]);
-        setProducts(productsData);
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const [productsData, categoriesData] = await Promise.all([
+        getProducts(selectedCategory === 'all' ? undefined : selectedCategory, searchTerm),
+        getCategories()
+      ]);
+      setProducts(productsData);
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, [selectedCategory, searchTerm]);
 
@@ -62,6 +63,16 @@ const Products = () => {
     <div className="space-y-8">
       {/* Filters and Search */}
       <div className="bg-white p-6 rounded-xl shadow-grocery">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-grocery-dark">Products</h2>
+          <button
+            onClick={() => navigate('/add-product')}
+            className="btn btn-primary flex items-center gap-2"
+          >
+            <Plus size={20} />
+            Add Product
+          </button>
+        </div>
         <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
