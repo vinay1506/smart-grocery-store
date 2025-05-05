@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
-import { createOrder } from '../api/orders';
+import { useCart } from '../contexts/CartContext';
+import { createOrder } from '../api/orders'; // Ensure this is correctly imported
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
@@ -14,19 +14,20 @@ export default function Checkout() {
     paymentMethod: 'UPI',
   });
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // To manage loading state
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setError(null); // Clear any previous errors
+    setIsLoading(true); // Start loading
 
     try {
-      // In a real application, you would first create/authenticate the customer
-      // For now, we'll use a temporary customer ID
+      // Ensure customer_id is valid or create it dynamically in a real application
       const customerId = 1;
 
       const orderData = {
         customer_id: customerId,
-        items: items.map(item => ({
+        items: items.map((item) => ({
           product_id: item.product_id,
           quantity: item.quantity,
           price: item.price,
@@ -38,12 +39,16 @@ export default function Checkout() {
         },
       };
 
+      // Call the API to create the order
       const { orderId } = await createOrder(orderData);
-      clearCart();
-      navigate(`/order-confirmation?orderId=${orderId}`);
-    } catch (err) {
+
+      clearCart(); // Clear the cart after successful order creation
+      navigate(`/order-confirmation?orderId=${orderId}`); // Navigate to order confirmation page
+    } catch (err: any) {
       console.error('Error creating order:', err);
-      setError('Failed to create order. Please try again.');
+      setError('Failed to create order. Please try again.'); // Show error message
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -125,8 +130,9 @@ export default function Checkout() {
             <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={isLoading} // Disable button while loading
             >
-              Place Order
+              {isLoading ? 'Placing Order...' : 'Place Order'}
             </button>
           </form>
         </div>
@@ -150,4 +156,4 @@ export default function Checkout() {
       </div>
     </div>
   );
-} 
+}

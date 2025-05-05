@@ -42,14 +42,15 @@ router.get('/', async (req, res) => {
     }
 
     const [products] = await pool.execute<Product[]>(sql, params);
-    // Convert price strings to numbers
+
     const formattedProducts = products.map((product) => ({
       ...product,
       price: parseFloat(product.price)
     }));
+
     res.json(formattedProducts);
-  } catch (error) {
-    console.error('Error fetching products:', error);
+  } catch (error: any) {
+    console.error('Error fetching products:', error.message);
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
@@ -59,8 +60,8 @@ router.get('/categories', async (req, res) => {
   try {
     const [categories] = await pool.execute('SELECT * FROM Product_Category');
     res.json(categories);
-  } catch (error) {
-    console.error('Error fetching categories:', error);
+  } catch (error: any) {
+    console.error('Error fetching categories:', error.message);
     res.status(500).json({ error: 'Failed to fetch categories' });
   }
 });
@@ -84,8 +85,8 @@ router.get('/:id', async (req, res) => {
     }
 
     res.json(products[0]);
-  } catch (error) {
-    console.error('Error fetching product:', error);
+  } catch (error: any) {
+    console.error('Error fetching product:', error.message);
     res.status(500).json({ error: 'Failed to fetch product' });
   }
 });
@@ -93,20 +94,19 @@ router.get('/:id', async (req, res) => {
 // Create a new product
 router.post('/', async (req, res) => {
   try {
-    const { name, description, price, category_id, image_url } = req.body;
+    const { name, description, price, category_id, image_url, stock_quantity } = req.body;
 
-    // Validate required fields
-    if (!name || !description || !price || !category_id) {
+    if (!name || !description || !price || !category_id || stock_quantity == null) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Insert the new product
     const [result] = await pool.query<ResultSetHeader>(
-      'INSERT INTO Product_Details (name, description, price, category_id, image_url) VALUES (?, ?, ?, ?, ?)',
-      [name, description, price, category_id, image_url]
+      `INSERT INTO Product_Details 
+        (name, description, price, category_id, image_url, stock_quantity) 
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [name, description, price, category_id, image_url, stock_quantity]
     );
 
-    // Get the inserted product with category name
     const [products] = await pool.query<RowDataPacket[]>(
       `SELECT 
         pd.*, 
@@ -118,10 +118,10 @@ router.post('/', async (req, res) => {
     );
 
     res.status(201).json(products[0]);
-  } catch (error) {
-    console.error('Error creating product:', error);
+  } catch (error: any) {
+    console.error('Error creating product:', error.message);
     res.status(500).json({ error: 'Failed to create product' });
   }
 });
 
-export default router; 
+export default router;

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../contexts/CartContext';
 
 export default function CartIcon() {
   const { totalItems } = useCart();

@@ -5,9 +5,10 @@ import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
-import Checkout from './pages/Checkout';
+import CheckoutPage from './pages/CheckoutPage';
 import OrderConfirmation from './pages/OrderConfirmation';
 import AddProduct from './pages/AddProduct';
+import OrderHistory from './pages/OrderHistory';
 
 function App() {
   return (
@@ -21,9 +22,10 @@ function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/products/:id" element={<ProductDetails />} />
               <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/add-product" element={<AddProduct />} />
+              <Route path="/orders" element={<OrderHistory />} />
             </Routes>
           </main>
           <footer className="bg-white py-8 mt-12">

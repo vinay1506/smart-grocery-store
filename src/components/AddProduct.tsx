@@ -14,28 +14,30 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
     price: '',
     image_url: '',
     category_id: '',
-    stock: ''
+    stock_quantity: '' // Updated key name
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Use a default image URL if none is provided
       const imageUrl = formData.image_url || `https://source.unsplash.com/random/300x300/?${formData.name}`;
-      
+
       await createProduct({
-        ...formData,
+        name: formData.name,
+        description: formData.description,
         price: parseFloat(formData.price),
-        stock: parseInt(formData.stock),
-        image_url: imageUrl
+        image_url: imageUrl,
+        category_id: formData.category_id,
+        stock_quantity: parseInt(formData.stock_quantity) || 0
       });
+
       setFormData({
         name: '',
         description: '',
         price: '',
         image_url: '',
         category_id: '',
-        stock: ''
+        stock_quantity: ''
       });
       setIsOpen(false);
       onProductAdded();
@@ -46,10 +48,7 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
 
   return (
     <div>
-      <button
-        onClick={() => setIsOpen(true)}
-        className="btn btn-primary mb-6"
-      >
+      <button onClick={() => setIsOpen(true)} className="btn btn-primary mb-6">
         Add New Product
       </button>
 
@@ -58,18 +57,13 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
           <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-grocery-dark">Add New Product</h2>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
+              <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gray-700">
                 ✕
               </button>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Product Name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
                 <input
                   type="text"
                   value={formData.name}
@@ -80,9 +74,7 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -93,9 +85,7 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
                 <input
                   type="number"
                   value={formData.price}
@@ -107,9 +97,7 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Image URL (Optional)
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL (Optional)</label>
                 <input
                   type="url"
                   value={formData.image_url}
@@ -120,9 +108,7 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                 <select
                   value={formData.category_id}
                   onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
@@ -139,24 +125,18 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Stock
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
                 <input
                   type="number"
-                  value={formData.stock}
-                  onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                  value={formData.stock_quantity}
+                  onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
                   className="input w-full"
                   required
                 />
               </div>
 
               <div className="flex justify-end gap-4 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="btn btn-secondary"
-                >
+                <button type="button" onClick={() => setIsOpen(false)} className="btn btn-secondary">
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary">
@@ -171,4 +151,4 @@ const AddProduct = ({ categories, onProductAdded }: AddProductProps) => {
   );
 };
 
-export default AddProduct; 
+export default AddProduct;

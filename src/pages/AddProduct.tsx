@@ -10,6 +10,7 @@ const AddProduct = () => {
     name: '',
     description: '',
     price: '',
+    stock_quantity: '',
     category_id: '',
     image_url: ''
   });
@@ -43,7 +44,7 @@ const AddProduct = () => {
 
     try {
       // Validate form data
-      if (!formData.name || !formData.description || !formData.price || !formData.category_id) {
+      if (!formData.name || !formData.description || !formData.price || !formData.category_id || !formData.stock_quantity) {
         throw new Error('Please fill in all required fields');
       }
 
@@ -53,12 +54,19 @@ const AddProduct = () => {
         throw new Error('Please enter a valid price');
       }
 
+      // Convert stock quantity to number
+      const stockQuantity = parseInt(formData.stock_quantity);
+      if (isNaN(stockQuantity) || stockQuantity < 0) {
+        throw new Error('Please enter a valid stock quantity');
+      }
+
       // Create product data
       const productData = {
         name: formData.name,
         description: formData.description,
         price: price,
         category_id: parseInt(formData.category_id),
+        stock_quantity: stockQuantity,
         image_url: formData.image_url || `https://source.unsplash.com/random/300x300/?${formData.name}`
       };
 
@@ -133,6 +141,22 @@ const AddProduct = () => {
           </div>
 
           <div>
+            <label htmlFor="stock_quantity" className="block text-sm font-medium text-grocery-dark mb-1">
+              Stock Quantity *
+            </label>
+            <input
+              type="number"
+              id="stock_quantity"
+              name="stock_quantity"
+              value={formData.stock_quantity}
+              onChange={handleChange}
+              className="input w-full"
+              min="0"
+              required
+            />
+          </div>
+
+          <div>
             <label htmlFor="category_id" className="block text-sm font-medium text-grocery-dark mb-1">
               Category *
             </label>
@@ -191,4 +215,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct; 
+export default AddProduct;

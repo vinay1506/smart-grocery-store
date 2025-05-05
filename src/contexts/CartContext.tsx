@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface CartItem {
   id: number;
@@ -6,20 +6,33 @@ interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  product_id?: number;
+  description?: string;
+  categoryName?: string;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
+  items: CartItem[]; // Alias for cartItems for backward compatibility
   addToCart: (item: Omit<CartItem, 'quantity'>) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
+  totalItems: number;
+  totalPrice: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'>) => {
     setCartItems(prevItems => {
@@ -51,14 +64,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems([]);
   };
 
+  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const totalPrice = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+
   return (
     <CartContext.Provider
       value={{
         cartItems,
+        items: cartItems, // Alias for backward compatibility
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
+        totalItems,
+        totalPrice,
       }}
     >
       {children}
