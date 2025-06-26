@@ -25,7 +25,7 @@ A modern, full-stack grocery shopping application built with React, TypeScript, 
 ### Backend
 - Node.js
 - Express.js
-- MongoDB
+- MYsql
 - JWT Authentication
 
 ## 🚀 Getting Started
@@ -33,7 +33,7 @@ A modern, full-stack grocery shopping application built with React, TypeScript, 
 ### Prerequisites
 - Node.js (v18 or higher)
 - npm or yarn
-- MongoDB
+- Mysql
 
 ### Installation
 
@@ -127,4 +127,4 @@ Vinay - [GitHub](https://github.com/vinay1506)
 - [React](https://reactjs.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Vite](https://vitejs.dev/)
-- [MongoDB](https://www.mongodb.com/)
+  
